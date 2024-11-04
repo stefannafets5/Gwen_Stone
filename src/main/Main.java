@@ -81,6 +81,7 @@ public final class Main {
 
         for(int i = 0; i < inputData.getGames().size(); i++) {
             game.startGame(inputData, i);
+            boolean gameEnd = false;
 
             for (int j = 0; j < game.getActions().size(); j++) {
                 int index = game.getActions().get(j).getPlayerIdx() - 1;
@@ -95,40 +96,29 @@ public final class Main {
                     out.getPlayerMana(game.getPlayer(index).getTotalMana(), index + 1);
                 } else if (game.getActions().get(j).getCommand().equals("getCardsInHand")) {
                     out.getCardsInHand(game.getPlayer(index).getCardsInHand(), index + 1);
-                } else if (game.getActions().get(j).getCommand().equals("endPlayerTurn")) {
-                    game.endTurn();
-                } else if (game.getActions().get(j).getCommand().equals("placeCard")) {
-                    game.placeCard(game.getActions().get(j).getHandIdx(), out);
                 } else if (game.getActions().get(j).getCommand().equals("getCardsOnTable")) {
                     out.getCardsOnTable(game.getBoard());
-                } else if (game.getActions().get(j).getCommand().equals("cardUsesAttack")) {
-                    game.cardUsesAttack(game.getActions().get(j).getCardAttacker()
-                                        , game.getActions().get(j).getCardAttacked(), out);
                 } else if (game.getActions().get(j).getCommand().equals("getCardAtPosition")) {
-                    out.getCardAtPosition(game.getActions().get(j).getX(), game.getActions().get(j).getY()
-                                          , game.getBoard());
+                    out.getCardAtPosition(game.getActions().get(j).getX()
+                            , game.getActions().get(j).getY(), game.getBoard());
+                } else if (game.getActions().get(j).getCommand().equals("endPlayerTurn") && !gameEnd) {
+                    game.endTurn();
+                } else if (game.getActions().get(j).getCommand().equals("placeCard") && !gameEnd) {
+                    game.placeCard(game.getActions().get(j).getHandIdx(), out);
+                } else if (game.getActions().get(j).getCommand().equals("cardUsesAttack") && !gameEnd) {
+                    game.cardUsesAttack(game.getActions().get(j).getCardAttacker()
+                            , game.getActions().get(j).getCardAttacked(), out);
+                } else if (game.getActions().get(j).getCommand().equals("cardUsesAbility") && !gameEnd) {
+                    game.cardUsesAbility(game.getActions().get(j).getCardAttacker()
+                            , game.getActions().get(j).getCardAttacked(), out);
+                } else if (game.getActions().get(j).getCommand().equals("useAttackHero") && !gameEnd) {
+                    game.useAttackHero(game.getActions().get(j).getCardAttacker(), out);
+                    if (game.getPlayer(0).getHero().getHealth() <= 0 || game.getPlayer(1).getHero().getHealth() <= 0) {
+                        gameEnd = true; // someone lost
+                    }
                 }
             }
         }
-
-        /*
-         * TODO Implement your function here
-         *
-         * How to add output to the output array?
-         * There are multiple ways to do this, here is one example:
-         *
-         * ObjectMapper mapper = new ObjectMapper();
-         *
-         * ObjectNode objectNode = mapper.createObjectNode();
-         * objectNode.put("field_name", "field_value");
-         *
-         * ArrayNode arrayNode = mapper.createArrayNode();
-         * arrayNode.add(objectNode);
-         *
-         * output.add(arrayNode);
-         * output.add(objectNode);
-         *
-         */
 
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), output);

@@ -16,6 +16,17 @@ public class ConvertJson {
 
     }
 
+    public void gameEnded(int winnerIdx) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+        if (winnerIdx == 0) {
+            txt.put("gameEnded", "Player one killed the enemy hero.");
+        } else {
+            txt.put("gameEnded", "Player two killed the enemy hero.");
+        }
+        out.add(txt);
+    }
+
     public void noMana(int cardIdx) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
@@ -51,29 +62,24 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void friendlyFire(Coordinates cardAttacker, Coordinates cardAttacked) {
+    public void cardAttackingHeroError(Coordinates cardAttacker, String error) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
-        txt.put("command", "cardUsesAttack");
+        txt.put("command", "useAttackHero");
 
         ObjectNode txt2 = mapper.createObjectNode();
         txt2.put("x", cardAttacker.getX());
         txt2.put("y", cardAttacker.getY());
         txt.set("cardAttacker", txt2);
 
-        ObjectNode txt3 = mapper.createObjectNode();
-        txt3.put("x", cardAttacked.getX());
-        txt3.put("y", cardAttacked.getY());
-        txt.set("cardAttacked", txt3);
-
-        txt.put("error", "Attacked card does not belong to the enemy.");
+        txt.put("error", error);
         out.add(txt);
     }
 
-    public void hasAttacked(Coordinates cardAttacker, Coordinates cardAttacked) {
+    public void cardAttackingError(Coordinates cardAttacker, Coordinates cardAttacked, String command, String error) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
-        txt.put("command", "cardUsesAttack");
+        txt.put("command", command);
 
         ObjectNode txt2 = mapper.createObjectNode();
         txt2.put("x", cardAttacker.getX());
@@ -85,45 +91,7 @@ public class ConvertJson {
         txt3.put("y", cardAttacked.getY());
         txt.set("cardAttacked", txt3);
 
-        txt.put("error", "Attacker card has already attacked this turn.");
-        out.add(txt);
-    }
-
-    public void isFrozen(Coordinates cardAttacker, Coordinates cardAttacked) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode txt = mapper.createObjectNode();
-        txt.put("command", "cardUsesAttack");
-
-        ObjectNode txt2 = mapper.createObjectNode();
-        txt2.put("x", cardAttacker.getX());
-        txt2.put("y", cardAttacker.getY());
-        txt.set("cardAttacker", txt2);
-
-        ObjectNode txt3 = mapper.createObjectNode();
-        txt3.put("x", cardAttacked.getX());
-        txt3.put("y", cardAttacked.getY());
-        txt.set("cardAttacked", txt3);
-
-        txt.put("error", "Attacker card is frozen.");
-        out.add(txt);
-    }
-
-    public void attackedCardNotTank(Coordinates cardAttacker, Coordinates cardAttacked) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode txt = mapper.createObjectNode();
-        txt.put("command", "cardUsesAttack");
-
-        ObjectNode txt2 = mapper.createObjectNode();
-        txt2.put("x", cardAttacker.getX());
-        txt2.put("y", cardAttacker.getY());
-        txt.set("cardAttacker", txt2);
-
-        ObjectNode txt3 = mapper.createObjectNode();
-        txt3.put("x", cardAttacked.getX());
-        txt3.put("y", cardAttacked.getY());
-        txt.set("cardAttacked", txt3);
-
-        txt.put("error", "Attacked card is not of type 'Tank'.");
+        txt.put("error", error);
         out.add(txt);
     }
 

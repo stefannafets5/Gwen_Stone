@@ -118,6 +118,16 @@ public class Player {
         this.decks = decks;
     }
 
+    public void addWin() {
+        int currentWins = getGamesWon();
+        setGamesWon(currentWins + 1);
+    }
+
+    public void addGamePlayed() {
+        int currentGamesPlayed = getGamesPlayed();
+        setGamesPlayed(currentGamesPlayed + 1);
+    }
+
     public void addMana(int mana) {
         int currentMana = getTotalMana();
         setTotalMana(currentMana + mana);

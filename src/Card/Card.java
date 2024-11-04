@@ -78,6 +78,17 @@ public class Card {
         setHealth(getHealth() - minusHealth);
     }
 
+    public void addHealth(int plusHealth) {
+        setHealth(getHealth() + plusHealth);
+    }
+
+    public void subtractAttack(int minusAttack) {
+        setAttackDamage(getAttackDamage() - minusAttack);
+        if (getAttackDamage() < 0) {
+            setAttackDamage(0);
+        }
+    }
+
     @Override
     public String toString() {
         return "CardInput{"

@@ -7,6 +7,7 @@ public class Card {
     private int attackDamage;
     private int health;
     private int isFrozen = 0;
+    private int hasAttacked = 0;
     private String description;
     private ArrayList<String> colors;
     private String name;
@@ -36,6 +37,10 @@ public class Card {
     public void setHealth(final int health) {
         this.health = health;
     }
+
+    public int getHasAttacked() { return hasAttacked; }
+
+    public void setHasAttacked(int hasAttacked) { this.hasAttacked = hasAttacked; }
 
     public int getIsFrozen() {
         return isFrozen;
@@ -67,6 +72,10 @@ public class Card {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public void subtractHealth(int minusHealth) {
+        setHealth(getHealth() - minusHealth);
     }
 
     @Override

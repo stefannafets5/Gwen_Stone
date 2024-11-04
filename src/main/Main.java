@@ -71,40 +71,42 @@ public final class Main {
                 Input.class);
 
         ArrayNode output = objectMapper.createArrayNode();
-
         ConvertJson out = new ConvertJson(output);
 
         Game game = new Game(inputData.getPlayerOneDecks().getNrDecks()
                              , inputData.getPlayerOneDecks().getNrCardsInDeck()
                              , inputData.getPlayerTwoDecks().getNrDecks()
                              , inputData.getPlayerTwoDecks().getNrCardsInDeck());
-
-        game.getPlayer(0).copyAllDecks(inputData.getPlayerOneDecks().getDecks());
-        game.getPlayer(1).copyAllDecks(inputData.getPlayerTwoDecks().getDecks());
+        game.copyPlayerDecks(inputData);
 
         for(int i = 0; i < inputData.getGames().size(); i++) {
-            game.setPlayerTurn(inputData.getGames().get(i).getStartGame().getStartingPlayer());
-            game.setActions(inputData.getGames().get(i).getActions());
-
-            game.getPlayer(0).setHero(inputData.getGames().get(i).getStartGame().getPlayerOneHero());
-            game.getPlayer(1).setHero(inputData.getGames().get(i).getStartGame().getPlayerTwoHero());
-
-            game.getPlayer(0).shuffleDeck(inputData.getGames().get(i).getStartGame().getPlayerOneDeckIdx()
-                                            , inputData.getGames().get(i).getStartGame().getShuffleSeed());
-            game.getPlayer(1).shuffleDeck(inputData.getGames().get(i).getStartGame().getPlayerTwoDeckIdx()
-                                            , inputData.getGames().get(i).getStartGame().getShuffleSeed());
+            game.startGame(inputData, i);
 
             for (int j = 0; j < game.getActions().size(); j++) {
-                if (game.getActions().get(j).getCommand().equals("getPlayerDeck")) {
-                    out.getPlayerDeck(game.getPlayer(game.getActions().get(j).getPlayerIdx() - 1).getCurrentDeck()
-                                      , game.getActions().get(j).getPlayerIdx());
-                } else if (game.getActions().get(j).getCommand().equals("getPlayerHero")) {
-                    out.getPlayerHero(game.getPlayer(game.getActions().get(j).getPlayerIdx() - 1).getHero()
-                                      , game.getActions().get(j).getPlayerIdx());
-                } else if (game.getActions().get(j).getCommand().equals("getPlayerTurn")) {
-                    out.getPlayerTurn(game.getPlayerTurn());
-                } else if (game.getActions().get(j).getCommand().equals("getCardsInHand")) {
+                int index = game.getActions().get(j).getPlayerIdx() - 1;
 
+                if (game.getActions().get(j).getCommand().equals("getPlayerDeck")) {
+                    out.getPlayerDeck(game.getPlayer(index).getCurrentDeck(), index + 1);
+                } else if (game.getActions().get(j).getCommand().equals("getPlayerHero")) {
+                    out.getPlayerHero(game.getPlayer(index).getHero(), index + 1);
+                } else if (game.getActions().get(j).getCommand().equals("getPlayerTurn")) {
+                    out.getPlayerTurn(game.getPlayerTurn() + 1);
+                } else if (game.getActions().get(j).getCommand().equals("getPlayerMana")) {
+                    out.getPlayerMana(game.getPlayer(index).getTotalMana(), index + 1);
+                } else if (game.getActions().get(j).getCommand().equals("getCardsInHand")) {
+                    out.getCardsInHand(game.getPlayer(index).getCardsInHand(), index + 1);
+                } else if (game.getActions().get(j).getCommand().equals("endPlayerTurn")) {
+                    game.endTurn();
+                } else if (game.getActions().get(j).getCommand().equals("placeCard")) {
+                    game.placeCard(game.getActions().get(j).getHandIdx(), out);
+                } else if (game.getActions().get(j).getCommand().equals("getCardsOnTable")) {
+                    out.getCardsOnTable(game.getBoard());
+                } else if (game.getActions().get(j).getCommand().equals("cardUsesAttack")) {
+                    game.cardUsesAttack(game.getActions().get(j).getCardAttacker()
+                                        , game.getActions().get(j).getCardAttacked(), out);
+                } else if (game.getActions().get(j).getCommand().equals("getCardAtPosition")) {
+                    out.getCardAtPosition(game.getActions().get(j).getX(), game.getActions().get(j).getY()
+                                          , game.getBoard());
                 }
             }
         }

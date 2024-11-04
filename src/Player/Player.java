@@ -10,6 +10,8 @@ import fileio.CardInput;
 
 public class Player {
     public static final int INITIAL_HERO_HEALTH = 30;
+    public int hasPlayed;
+    private int totalMana = 0;
     private int decksNumber;
     private int cardsInDeckNumber;
     private int gamesWon = 0;
@@ -20,6 +22,7 @@ public class Player {
     private ArrayList<ArrayList<Card>> decks;
 
     public Player(int decksNumber, int cardsInDeckNumber) {
+        this.hasPlayed = 0;
         this.decksNumber = decksNumber;
         this.cardsInDeckNumber = cardsInDeckNumber;
         this.cardsInHand = new ArrayList<Card>();
@@ -41,6 +44,22 @@ public class Player {
         hero.setMana(heroInput.getMana());
         hero.setHealth(INITIAL_HERO_HEALTH);
         hero.setName(heroInput.getName());
+    }
+
+    public int getHasPlayed() {
+        return hasPlayed;
+    }
+
+    public void setHasPlayed(int hasPlayed) {
+        this.hasPlayed = hasPlayed;
+    }
+
+    public int getTotalMana() {
+        return totalMana;
+    }
+
+    public void setTotalMana(int totalMana) {
+        this.totalMana = totalMana;
     }
 
     public int getGamesWon() {
@@ -75,6 +94,14 @@ public class Player {
         this.cardsInDeckNumber = cardsInDeckNumber;
     }
 
+    public ArrayList<Card> getCardsInHand() {
+        return cardsInHand;
+    }
+
+    public void setCardsInHand(ArrayList<Card> cardsInHand) {
+        this.cardsInHand = cardsInHand;
+    }
+
     public ArrayList<Card> getCurrentDeck() {
         return currentDeck;
     }
@@ -91,9 +118,25 @@ public class Player {
         this.decks = decks;
     }
 
+    public void addMana(int mana) {
+        int currentMana = getTotalMana();
+        setTotalMana(currentMana + mana);
+    }
+
+    public void subtractMana(int mana) {
+        int currentMana = getTotalMana();
+        setTotalMana(currentMana - mana);
+    }
+
     public void shuffleDeck(int deckNumber, int seed) {
         currentDeck = new ArrayList<>(decks.get(deckNumber));
         Collections.shuffle(currentDeck, new Random(seed));
+        cardsInHand.clear();
+        cardsInHand.add(currentDeck.remove(0));
+    }
+
+    public void fromDeckToHand() {
+        cardsInHand.add(currentDeck.remove(0));
     }
 
     public void copyAllDecks(ArrayList<ArrayList<CardInput>> InputDecks) {

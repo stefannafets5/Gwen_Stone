@@ -1,73 +1,86 @@
-package Game;
+package game;
 
-import Card.Card;
-import Player.Player;
-import ConvertJson.ConvertJson;
-import Player.Player;
-import fileio.*;
+import card.Card;
+import player.Player;
+import converter.ConvertJson;
 import fileio.ActionsInput;
+import fileio.Coordinates;
+import fileio.Input;
+
 
 import java.util.ArrayList;
 
 public class Game {
+    public static final int BOARD_ROWS = 4;
+    public static final int MAX_MANA_PER_TURN = 10;
+    public static final int MAX_ROW_SIZE = 5;
+    public static final int PLAYER_0_FRONT_ROW = 3;
     private int gameTurn = 1;
-    private Player[] players = new Player[2];
+    private final Player[] players = new Player[2];
     private int playerTurn;
     private ArrayList<ActionsInput> actions;
-    private ArrayList<ArrayList<Card>> board;
+    private final ArrayList<ArrayList<Card>> board;
 
-    public Game(int decksNumber1, int cardsInDeckNumber1, int decksNumber2, int cardsInDeckNumber2) {
-        players[0] = new Player(decksNumber1, cardsInDeckNumber1);
-        players[1] = new Player(decksNumber2, cardsInDeckNumber2);
+    public Game(final int decksNumber1, final int decksNumber2) {
+        players[0] = new Player(decksNumber1);
+        players[1] = new Player(decksNumber2);
         this.board = new ArrayList<>();
 
-        for (int i = 0; i < 4; i++) {
-            board.add(new ArrayList<Card>());
+        for (int i = 0; i < BOARD_ROWS; i++) {
+            board.add(new ArrayList<>());
         }
     }
 
-    public int getGameTurn() {
+    public final int getGameTurn() {
         return gameTurn;
     }
 
-    public void setGameTurn(int gameTurn) {
+    public final void setGameTurn(final int gameTurn) {
         this.gameTurn = gameTurn;
     }
 
-    public Player getPlayer(int i) {
+    /**
+     *
+     * @param i
+     * @return
+     */
+    public final Player getPlayer(final int i) {
         return players[i];
     }
 
-    public ArrayList<ActionsInput> getActions() {
+    public final ArrayList<ActionsInput> getActions() {
         return actions;
     }
 
-    public void setActions(ArrayList<ActionsInput> actions) {
+    public final void setActions(final ArrayList<ActionsInput> actions) {
         this.actions = actions;
     }
 
-    public int getPlayerTurn() {
+    public final int getPlayerTurn() {
         return playerTurn;
     }
 
-    public void setPlayerTurn(int playerTurn) {
+    public final void setPlayerTurn(final int playerTurn) {
         this.playerTurn = playerTurn;
     }
 
-    public ArrayList<ArrayList<Card>> getBoard() {
+    public final ArrayList<ArrayList<Card>> getBoard() {
         return board;
     }
 
-    public void setBoard(ArrayList<ArrayList<Card>> board) {
-        this.board = board;
-    }
-
-    public void copyPlayerDecks(Input inputData) {
+    /**
+     *
+     * @param inputData
+     */
+    public final void copyPlayerDecks(final Input inputData) {
         getPlayer(0).copyAllDecks(inputData.getPlayerOneDecks().getDecks());
         getPlayer(1).copyAllDecks(inputData.getPlayerTwoDecks().getDecks());
     }
 
-    public void endTurn () {
+    /**
+     *
+     */
+    public final void endTurn() {
         int playerIdx = getPlayerTurn();
         int nextPlayer = (playerIdx + 1) % 2;
         getPlayer(playerIdx).setHasPlayed(1);
@@ -78,12 +91,12 @@ public class Game {
             int aux = getGameTurn();
             setGameTurn(aux + 1);
 
-            if (getGameTurn() <= 10) {
+            if (getGameTurn() <= MAX_MANA_PER_TURN) {
                 getPlayer(0).addMana(getGameTurn());
                 getPlayer(1).addMana(getGameTurn());
             } else {
-                getPlayer(0).addMana(10);
-                getPlayer(1).addMana(10);
+                getPlayer(0).addMana(MAX_MANA_PER_TURN);
+                getPlayer(1).addMana(MAX_MANA_PER_TURN);
             }
 
             if (!getPlayer(0).getCurrentDeck().isEmpty()) {
@@ -94,7 +107,7 @@ public class Game {
             }
         }
         if (playerIdx == 0) {
-            for (int i = 2; i < 4; i++) {
+            for (int i = 2; i < BOARD_ROWS; i++) {
                 for (int j = 0; j < getBoard().get(i).size(); j++) {
                     getBoard().get(i).get(j).setIsFrozen(0);
                     getBoard().get(i).get(j).setHasAttacked(0);
@@ -113,47 +126,67 @@ public class Game {
         setPlayerTurn(nextPlayer);
     }
 
-    public void placeCard (int cardIdx, ConvertJson out) {
+    /**
+     *
+     * @param cardIdx
+     * @param out
+     */
+    public final void placeCard(final int cardIdx, final ConvertJson out) {
         int playerIdx = getPlayerTurn();
         Card placedCard = getPlayer(playerIdx).getCardsInHand().get(cardIdx);
         int manaCost = placedCard.getMana();
 
         if (getPlayer(playerIdx).getTotalMana() >= manaCost) {
             getPlayer(playerIdx).subtractMana(manaCost);
-            int row;
-            if (placedCard.getName().equals("Goliath") || placedCard.getName().equals("Warden")
-                || placedCard.getName().equals("The Ripper") || placedCard.getName().equals("Miraj")) {
-                row = 1;
-                if (playerIdx == 0) {
-                    row = 2;
-                }
-            } else {
-                row = 0;
-                if (playerIdx == 0) {
-                    row = 3;
-                }
-            }
-            if (getBoard().get(row).size() == 5) {
+            int row = getRow(placedCard, playerIdx);
+            if (getBoard().get(row).size() == MAX_ROW_SIZE) {
                 out.noSpaceToPlace(cardIdx);
             } else {
                 getBoard().get(row).add(placedCard.cloneCard());
                 getPlayer(playerIdx).getCardsInHand().remove(cardIdx);
             }
         } else {
-            out.noMana(cardIdx, "handIdx", "placeCard"
-                       , "Not enough mana to place card on table.");
+            out.noMana(cardIdx, "handIdx", "placeCard",
+                    "Not enough mana to place card on table.");
         }
     }
 
-    public void useHeroAbility(int affectedRow, ConvertJson out) {
+    private static int getRow(final Card placedCard, final int playerIdx) {
+        int row;
+        if (placedCard.getName().equals("Goliath")
+                || placedCard.getName().equals("Warden")
+                || placedCard.getName().equals("The Ripper")
+                || placedCard.getName().equals("Miraj")) {
+            row = 1;
+            if (playerIdx == 0) {
+                row = 2;
+            }
+        } else {
+            row = 0;
+            if (playerIdx == 0) {
+                row = PLAYER_0_FRONT_ROW;
+            }
+        }
+        return row;
+    }
+
+    /**
+     *
+     * @param affectedRow
+     * @param out
+     */
+    public final void useHeroAbility(final int affectedRow, final ConvertJson out) {
         Card currentHero = getPlayer(getPlayerTurn()).getHero();
         int manaCost = currentHero.getMana();
         if (getPlayer(getPlayerTurn()).getTotalMana() >= manaCost) {
             if (currentHero.getHasAttacked() == 0) {
-                if (currentHero.getName().equals("Lord Royce") || currentHero.getName().equals("Empress Thorina")) {
-                    if ((getPlayerTurn() == 0 && (affectedRow == 2 || affectedRow == 3))
-                        || (getPlayerTurn() == 1 && (affectedRow == 0 || affectedRow == 1))) {
-                        out.wrongRowAttacked(affectedRow, "Selected row does not belong to the enemy.");
+                if (currentHero.getName().equals("Lord Royce")
+                        || currentHero.getName().equals("Empress Thorina")) {
+                    if ((getPlayerTurn() == 0
+                            && (affectedRow == 2 || affectedRow == PLAYER_0_FRONT_ROW))
+                            || (getPlayerTurn() == 1 && (affectedRow == 0 || affectedRow == 1))) {
+                        out.wrongRowAttacked(affectedRow,
+                                "Selected row does not belong to the enemy.");
                     } else {
                         currentHero.setHasAttacked(1);
                         getPlayer(getPlayerTurn()).subtractMana(manaCost);
@@ -176,9 +209,12 @@ public class Game {
                         }
                     }
                 } else {
-                    if ((getPlayerTurn() == 1 && (affectedRow == 2 || affectedRow == 3))
-                        || (getPlayerTurn() == 0 && (affectedRow == 0 || affectedRow == 1))) {
-                        out.wrongRowAttacked(affectedRow, "Selected row does not belong to the current player.");
+                    if ((getPlayerTurn() == 1 && (affectedRow == 2
+                            || affectedRow == PLAYER_0_FRONT_ROW))
+                            || (getPlayerTurn() == 0
+                            && (affectedRow == 0 || affectedRow == 1))) {
+                        out.wrongRowAttacked(affectedRow,
+                                "Selected row does not belong to the current player.");
                     } else {
                         currentHero.setHasAttacked(1);
                         getPlayer(getPlayerTurn()).subtractMana(manaCost);
@@ -197,12 +233,20 @@ public class Game {
                 out.heroHasAttacked(affectedRow);
             }
         } else {
-            out.noMana(affectedRow, "affectedRow", "useHeroAbility"
-                       , "Not enough mana to use hero's ability.");
+            out.noMana(affectedRow, "affectedRow", "useHeroAbility",
+                    "Not enough mana to use hero's ability.");
         }
     }
 
-    public void cardUsesAbility(Coordinates cardAttacker, Coordinates cardAttacked, ConvertJson out) {
+    /**
+     *
+     * @param cardAttacker
+     * @param cardAttacked
+     * @param out
+     */
+    public final void cardUsesAbility(final Coordinates cardAttacker,
+                                      final Coordinates cardAttacked,
+                                      final ConvertJson out) {
         int x1 = cardAttacker.getX();
         int y1 = cardAttacker.getY();
         int x2 = cardAttacked.getX();
@@ -211,20 +255,26 @@ public class Game {
         if (y2 < getBoard().get(x2).size() && y1 < getBoard().get(x1).size()) {
             int playerIdx = getPlayerTurn();
             if (getBoard().get(x1).get(y1).getIsFrozen() == 1) {
-                out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAbility","Attacker card is frozen.");
+                out.cardAttackingError(cardAttacker, cardAttacked,
+                        "cardUsesAbility", "Attacker card is frozen.");
             } else if (getBoard().get(x1).get(y1).getHasAttacked() == 1) {
-                out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAbility", "Attacker card has already attacked this turn.");
-            } else if (getBoard().get(x1).get(y1).getName().equals("Disciple")){
-                if ((playerIdx == 0 && (x2 == 2 || x2 == 3)) || (playerIdx == 1 && (x2 == 0 || x2 == 1))) {
+                out.cardAttackingError(cardAttacker, cardAttacked,
+                        "cardUsesAbility", "Attacker card has already attacked this turn.");
+            } else if (getBoard().get(x1).get(y1).getName().equals("Disciple")) {
+                if ((playerIdx == 0 && (x2 == 2 || x2 == PLAYER_0_FRONT_ROW))
+                        || (playerIdx == 1 && (x2 == 0 || x2 == 1))) {
                     getBoard().get(x2).get(y2).addHealth(2);
                     getBoard().get(x1).get(y1).setHasAttacked(1);
                 } else {
-                    out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAbility", "Attacked card does not belong to the current player.");
+                    out.cardAttackingError(cardAttacker, cardAttacked,
+                            "cardUsesAbility",
+                            "Attacked card does not belong to the current player.");
                 }
             } else if (getBoard().get(x1).get(y1).getName().equals("The Ripper")
                        || getBoard().get(x1).get(y1).getName().equals("Miraj")
                        || getBoard().get(x1).get(y1).getName().equals("The Cursed One")) {
-                if ((playerIdx == 0 && (x2 == 0 || x2 == 1)) || (playerIdx == 1 && (x2 == 2 || x2 == 3))){
+                if ((playerIdx == 0 && (x2 == 0 || x2 == 1))
+                        || (playerIdx == 1 && (x2 == 2 || x2 == PLAYER_0_FRONT_ROW))) {
                     int attackedCardIsTank = 0;
                     if (getBoard().get(x2).get(y2).getName().equals("Goliath")
                             || getBoard().get(x2).get(y2).getName().equals("Warden")) {
@@ -232,14 +282,16 @@ public class Game {
                     }
                     int enemyHasTank = getEnemyHasTank(playerIdx);
                     if ((enemyHasTank == 1) && (attackedCardIsTank == 0)) {
-                        out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAbility", "Attacked card is not of type 'Tank'.");
+                        out.cardAttackingError(cardAttacker, cardAttacked,
+                                "cardUsesAbility", "Attacked card is not of type 'Tank'.");
                     } else {
                         if (getBoard().get(x1).get(y1).getName().equals("The Ripper")) {
                             getBoard().get(x2).get(y2).subtractAttack(2);
                             getBoard().get(x1).get(y1).setHasAttacked(1);
                         } else if (getBoard().get(x1).get(y1).getName().equals("Miraj")) {
                             int aux = getBoard().get(x1).get(y1).getHealth();
-                            getBoard().get(x1).get(y1).setHealth(getBoard().get(x2).get(y2).getHealth());
+                            int aux2 = getBoard().get(x2).get(y2).getHealth();
+                            getBoard().get(x1).get(y1).setHealth(aux2);
                             getBoard().get(x2).get(y2).setHealth(aux);
                             getBoard().get(x1).get(y1).setHasAttacked(1);
                         } else { /// The cursed one
@@ -247,21 +299,30 @@ public class Game {
                                 getBoard().get(x2).remove(y2);
                             } else {
                                 int aux = getBoard().get(x2).get(y2).getAttackDamage();
-                                getBoard().get(x2).get(y2).setAttackDamage(getBoard().get(x2).get(y2).getHealth());
+                                int aux2 = getBoard().get(x2).get(y2).getHealth();
+                                getBoard().get(x2).get(y2).setAttackDamage(aux2);
                                 getBoard().get(x2).get(y2).setHealth(aux);
                             }
                             getBoard().get(x1).get(y1).setHasAttacked(1);
                         }
                     }
                 } else {
-                    out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAbility"
-                                           , "Attacked card does not belong to the enemy.");
+                    out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAbility",
+                            "Attacked card does not belong to the enemy.");
                 }
             }
         }
     }
 
-    public void cardUsesAttack(Coordinates cardAttacker, Coordinates cardAttacked, ConvertJson out) {
+    /**
+     *
+     * @param cardAttacker
+     * @param cardAttacked
+     * @param out
+     */
+    public final void cardUsesAttack(final Coordinates cardAttacker,
+                                     final Coordinates cardAttacked,
+                                     final ConvertJson out) {
         int x1 = cardAttacker.getX();
         int y1 = cardAttacker.getY();
         int x2 = cardAttacked.getX();
@@ -276,16 +337,22 @@ public class Game {
             }
             int enemyHasTank = getEnemyHasTank(playerIdx);
 
-            if ((playerIdx == 0 && (x2 == 2 || x2 == 3)) || (playerIdx == 1 && (x2 == 0 || x2 == 1))) {
-                out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAttack", "Attacked card does not belong to the enemy.");
+            if ((playerIdx == 0 && (x2 == 2 || x2 == PLAYER_0_FRONT_ROW))
+                    || (playerIdx == 1 && (x2 == 0 || x2 == 1))) {
+                out.cardAttackingError(cardAttacker, cardAttacked,
+                        "cardUsesAttack", "Attacked card does not belong to the enemy.");
             } else if (getBoard().get(x1).get(y1).getHasAttacked() == 1) {
-                out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAttack", "Attacker card has already attacked this turn.");
+                out.cardAttackingError(cardAttacker, cardAttacked,
+                        "cardUsesAttack", "Attacker card has already attacked this turn.");
             } else if (getBoard().get(x1).get(y1).getIsFrozen() == 1) {
-                out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAttack", "Attacker card is frozen.");
+                out.cardAttackingError(cardAttacker, cardAttacked,
+                        "cardUsesAttack", "Attacker card is frozen.");
             } else if ((enemyHasTank == 1) && (attackedCardIsTank == 0)) {
-                out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAttack", "Attacked card is not of type 'Tank'.");
+                out.cardAttackingError(cardAttacker, cardAttacked,
+                        "cardUsesAttack", "Attacked card is not of type 'Tank'.");
             } else { // can attack
-                getBoard().get(x2).get(y2).subtractHealth(getBoard().get(x1).get(y1).getAttackDamage());
+                int attack = getBoard().get(x1).get(y1).getAttackDamage();
+                getBoard().get(x2).get(y2).subtractHealth(attack);
                 if (getBoard().get(x2).get(y2).getHealth() <= 0) {
                     getBoard().get(x2).remove(y2);
                 }
@@ -294,7 +361,12 @@ public class Game {
         }
     }
 
-    public void useAttackHero(Coordinates cardAttacker, ConvertJson out) {
+    /**
+     *
+     * @param cardAttacker
+     * @param out
+     */
+    public final void useAttackHero(final Coordinates cardAttacker, final ConvertJson out) {
         int x1 = cardAttacker.getX();
         int y1 = cardAttacker.getY();
 
@@ -304,14 +376,18 @@ public class Game {
             if (getBoard().get(x1).get(y1).getIsFrozen() == 1) {
                 out.cardAttackingHeroError(cardAttacker, "Attacker card is frozen.");
             } else if (getBoard().get(x1).get(y1).getHasAttacked() == 1) {
-                out.cardAttackingHeroError(cardAttacker, "Attacker card has already attacked this turn.");
+                out.cardAttackingHeroError(cardAttacker,
+                        "Attacker card has already attacked this turn.");
             } else if (enemyHasTank == 1) {
-                out.cardAttackingHeroError(cardAttacker, "Attacked card is not of type 'Tank'.");
+                out.cardAttackingHeroError(cardAttacker,
+                        "Attacked card is not of type 'Tank'.");
             } else {
                 int enemyIdx = (playerIdx + 1) % 2;
-                getPlayer(enemyIdx).getHero().subtractHealth(getBoard().get(x1).get(y1).getAttackDamage());
+                int attack = getBoard().get(x1).get(y1).getAttackDamage();
+                getPlayer(enemyIdx).getHero().subtractHealth(attack);
                 getBoard().get(x1).get(y1).setHasAttacked(1);
-                if (getPlayer(0).getHero().getHealth() <= 0 || getPlayer(1).getHero().getHealth() <= 0) {
+                if (getPlayer(0).getHero().getHealth() <= 0
+                        || getPlayer(1).getHero().getHealth() <= 0) {
                     out.gameEnded(playerIdx);
                     getPlayer(playerIdx).addWin();
                     getPlayer(0).addGamePlayed();
@@ -321,7 +397,12 @@ public class Game {
         }
     }
 
-    private int getEnemyHasTank(int playerIdx) {
+    /**
+     *
+     * @param playerIdx
+     * @return
+     */
+    private int getEnemyHasTank(final int playerIdx) {
         int enemyHasTank = 0;
         if (playerIdx == 0) {
             for (int i = 0; i < getBoard().get(1).size(); i++) {
@@ -345,13 +426,18 @@ public class Game {
         return enemyHasTank;
     }
 
-    public void startGame(Input inputData, int i) {
+    /**
+     *
+     * @param inputData
+     * @param i
+     */
+    public final void startGame(final Input inputData, final int i) {
         setPlayerTurn(inputData.getGames().get(i).getStartGame().getStartingPlayer() - 1);
         for (int j = 0; j < 2; j++) {
             getPlayer(j).setTotalMana(1);
             getPlayer(j).setHasPlayed(0);
         }
-        for (int j = 0 ; j < getBoard().size(); j++) {
+        for (int j = 0; j < getBoard().size(); j++) {
             getBoard().get(j).clear();
         }
         setGameTurn(1);
@@ -360,9 +446,9 @@ public class Game {
         getPlayer(0).setHero(inputData.getGames().get(i).getStartGame().getPlayerOneHero());
         getPlayer(1).setHero(inputData.getGames().get(i).getStartGame().getPlayerTwoHero());
 
-        getPlayer(0).shuffleDeck(inputData.getGames().get(i).getStartGame().getPlayerOneDeckIdx()
-                                   , inputData.getGames().get(i).getStartGame().getShuffleSeed());
-        getPlayer(1).shuffleDeck(inputData.getGames().get(i).getStartGame().getPlayerTwoDeckIdx()
-                                   , inputData.getGames().get(i).getStartGame().getShuffleSeed());
+        getPlayer(0).shuffleDeck(inputData.getGames().get(i).getStartGame().getPlayerOneDeckIdx(),
+                inputData.getGames().get(i).getStartGame().getShuffleSeed());
+        getPlayer(1).shuffleDeck(inputData.getGames().get(i).getStartGame().getPlayerTwoDeckIdx(),
+                inputData.getGames().get(i).getStartGame().getShuffleSeed());
     }
 }

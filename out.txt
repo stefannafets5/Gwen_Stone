@@ -258,7 +258,7 @@
   "command" : "getFrozenCardsOnTable",
   "output" : [ ]
 }, {
-  "gameEnded" : "Player one killed the enemy hero."
+  "gameEnded" : "player one killed the enemy hero."
 }, {
   "command" : "getPlayerMana",
   "playerIdx" : 1,
@@ -699,7 +699,7 @@
   "command" : "getFrozenCardsOnTable",
   "output" : [ ]
 }, {
-  "gameEnded" : "Player one killed the enemy hero."
+  "gameEnded" : "player one killed the enemy hero."
 }, {
   "command" : "getPlayerMana",
   "playerIdx" : 1,

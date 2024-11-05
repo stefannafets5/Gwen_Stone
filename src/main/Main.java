@@ -1,7 +1,8 @@
 package main;
 
-import ConvertJson.ConvertJson;
+import converter.ConvertJson;
 import checker.Checker;
+import game.Game;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -15,8 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
-
-import Game.Game;
 
 /**
  * The entry point to this homework. It runs the checker that tests your implementation.
@@ -73,13 +72,11 @@ public final class Main {
         ArrayNode output = objectMapper.createArrayNode();
         ConvertJson out = new ConvertJson(output);
 
-        Game game = new Game(inputData.getPlayerOneDecks().getNrDecks()
-                             , inputData.getPlayerOneDecks().getNrCardsInDeck()
-                             , inputData.getPlayerTwoDecks().getNrDecks()
-                             , inputData.getPlayerTwoDecks().getNrCardsInDeck());
+        Game game = new Game(inputData.getPlayerOneDecks().getNrDecks(),
+                inputData.getPlayerTwoDecks().getNrDecks());
         game.copyPlayerDecks(inputData);
 
-        for(int i = 0; i < inputData.getGames().size(); i++) {
+        for (int i = 0; i < inputData.getGames().size(); i++) {
             game.startGame(inputData, i);
             game.setGameTurn(1);
             boolean gameEnd = false;
@@ -102,30 +99,37 @@ public final class Main {
                 } else if (game.getActions().get(j).getCommand().equals("getFrozenCardsOnTable")) {
                     out.getFrozenCardsOnTable(game.getBoard());
                 } else if (game.getActions().get(j).getCommand().equals("getCardAtPosition")) {
-                    out.getCardAtPosition(game.getActions().get(j).getX()
-                            , game.getActions().get(j).getY(), game.getBoard());
+                    out.getCardAtPosition(game.getActions().get(j).getX(),
+                            game.getActions().get(j).getY(), game.getBoard());
                 } else if (game.getActions().get(j).getCommand().equals("getTotalGamesPlayed")) {
                     out.getTotalGamesPlayed(game.getPlayer(0));
                 } else if (game.getActions().get(j).getCommand().equals("getPlayerOneWins")) {
                     out.getPlayerOneWins(game.getPlayer(0));
                 } else if (game.getActions().get(j).getCommand().equals("getPlayerTwoWins")) {
                     out.getPlayerTwoWins(game.getPlayer(1));
-                } else if (game.getActions().get(j).getCommand().equals("endPlayerTurn") && !gameEnd) {
+                } else if (game.getActions().get(j).getCommand().equals("endPlayerTurn")
+                        && !gameEnd) {
                     game.endTurn();
-                } else if (game.getActions().get(j).getCommand().equals("placeCard") && !gameEnd) {
+                } else if (game.getActions().get(j).getCommand().equals("placeCard")
+                        && !gameEnd) {
                     game.placeCard(game.getActions().get(j).getHandIdx(), out);
-                } else if (game.getActions().get(j).getCommand().equals("cardUsesAttack") && !gameEnd) {
-                    game.cardUsesAttack(game.getActions().get(j).getCardAttacker()
-                            , game.getActions().get(j).getCardAttacked(), out);
-                } else if (game.getActions().get(j).getCommand().equals("cardUsesAbility") && !gameEnd) {
-                    game.cardUsesAbility(game.getActions().get(j).getCardAttacker()
-                            , game.getActions().get(j).getCardAttacked(), out);
-                } else if (game.getActions().get(j).getCommand().equals("useAttackHero") && !gameEnd) {
+                } else if (game.getActions().get(j).getCommand().equals("cardUsesAttack")
+                        && !gameEnd) {
+                    game.cardUsesAttack(game.getActions().get(j).getCardAttacker(),
+                            game.getActions().get(j).getCardAttacked(), out);
+                } else if (game.getActions().get(j).getCommand().equals("cardUsesAbility")
+                        && !gameEnd) {
+                    game.cardUsesAbility(game.getActions().get(j).getCardAttacker(),
+                            game.getActions().get(j).getCardAttacked(), out);
+                } else if (game.getActions().get(j).getCommand().equals("useAttackHero")
+                        && !gameEnd) {
                     game.useAttackHero(game.getActions().get(j).getCardAttacker(), out);
-                    if (game.getPlayer(0).getHero().getHealth() <= 0 || game.getPlayer(1).getHero().getHealth() <= 0) {
+                    if (game.getPlayer(0).getHero().getHealth() <= 0
+                            || game.getPlayer(1).getHero().getHealth() <= 0) {
                         gameEnd = true; // someone lost
                     }
-                } else if (game.getActions().get(j).getCommand().equals("useHeroAbility") && !gameEnd) {
+                } else if (game.getActions().get(j).getCommand().equals("useHeroAbility")
+                        && !gameEnd) {
                     game.useHeroAbility(game.getActions().get(j).getAffectedRow(), out);
                 }
             }

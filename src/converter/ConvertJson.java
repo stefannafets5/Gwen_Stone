@@ -1,23 +1,26 @@
-package ConvertJson;
+package converter;
 
-import Player.Player;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.util.ArrayList;
-import Card.Card;
-import Game.Game;
 import fileio.Coordinates;
+import player.Player;
+import card.Card;
+import game.Game;
 
 public class ConvertJson {
-    private ArrayNode out;
+    private final ArrayNode out;
 
-    public ConvertJson(ArrayNode output) {
+    public ConvertJson(final ArrayNode output) {
         this.out = output;
 
     }
 
-    public void getTotalGamesPlayed(Player player) {
+    /**
+     * @param player
+     */
+    public final void getTotalGamesPlayed(final Player player) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getTotalGamesPlayed");
@@ -25,7 +28,11 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void getPlayerOneWins(Player player) {
+    /**
+     *
+     * @param player
+     */
+    public final void getPlayerOneWins(final Player player) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getPlayerOneWins");
@@ -33,7 +40,11 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void getPlayerTwoWins(Player player) {
+    /**
+     *
+     * @param player
+     */
+    public final void getPlayerTwoWins(final Player player) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getPlayerTwoWins");
@@ -41,7 +52,11 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void gameEnded(int winnerIdx) {
+    /**
+     *
+     * @param winnerIdx
+     */
+    public final void gameEnded(final int winnerIdx) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         if (winnerIdx == 0) {
@@ -52,7 +67,11 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void heroHasAttacked(int affectedRow) {
+    /**
+     *
+     * @param affectedRow
+     */
+    public final void heroHasAttacked(final int affectedRow) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "useHeroAbility");
@@ -61,7 +80,12 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void wrongRowAttacked(int affectedRow, String error) {
+    /**
+     *
+     * @param affectedRow
+     * @param error
+     */
+    public final void wrongRowAttacked(final int affectedRow, final String error) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "useHeroAbility");
@@ -70,16 +94,28 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void noMana(int secondLineInt, String secondLine, String command, String error) {
+    /**
+     *
+     * @param out2Int
+     * @param outString
+     * @param command
+     * @param error
+     */
+    public final void noMana(final int out2Int, final String outString,
+                             final String command, final String error) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", command);
-        txt.put(secondLine, secondLineInt);
+        txt.put(outString, out2Int);
         txt.put("error", error);
         out.add(txt);
     }
 
-    public void noSpaceToPlace(int cardIdx) {
+    /**
+     *
+     * @param cardIdx
+     */
+    public final void noSpaceToPlace(final int cardIdx) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "placeCard");
@@ -88,7 +124,11 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void getPlayerTurn(int playerTurn) {
+    /**
+     *
+     * @param playerTurn
+     */
+    public final void getPlayerTurn(final int playerTurn) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getPlayerTurn");
@@ -96,7 +136,12 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void getPlayerMana(int mana, int playerIdx) {
+    /**
+     *
+     * @param mana
+     * @param playerIdx
+     */
+    public final void getPlayerMana(final int mana, final int playerIdx) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getPlayerMana");
@@ -105,7 +150,12 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void cardAttackingHeroError(Coordinates cardAttacker, String error) {
+    /**
+     *
+     * @param cardAttacker
+     * @param error
+     */
+    public final void cardAttackingHeroError(final Coordinates cardAttacker, final String error) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "useAttackHero");
@@ -119,7 +169,16 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void cardAttackingError(Coordinates cardAttacker, Coordinates cardAttacked, String command, String error) {
+    /**
+     *
+     * @param cardAttacker
+     * @param cardAttacked
+     * @param command
+     * @param error
+     */
+    public final void cardAttackingError(final Coordinates cardAttacker,
+                                         final Coordinates cardAttacked,
+                                         final String command, final String error) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", command);
@@ -138,27 +197,31 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void getCardsOnTable(ArrayList<ArrayList<Card>> board) {
+    /**
+     *
+     * @param board
+     */
+    public final void getCardsOnTable(final ArrayList<ArrayList<Card>> board) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getCardsOnTable");
 
         ArrayNode allCards = mapper.createArrayNode();
 
-        for (int i = 0; i < board.size(); i++) {
+        for (ArrayList<Card> cards : board) {
             ArrayNode txt1 = mapper.createArrayNode();
-            for (int j = 0; j < board.get(i).size(); j++) {
+            for (Card card : cards) {
                 ObjectNode txt2 = mapper.createObjectNode();
-                txt2.put("mana", board.get(i).get(j).getMana());
-                txt2.put("attackDamage", board.get(i).get(j).getAttackDamage());
-                txt2.put("health", board.get(i).get(j).getHealth());
-                txt2.put("description", board.get(i).get(j).getDescription());
+                txt2.put("mana", card.getMana());
+                txt2.put("attackDamage", card.getAttackDamage());
+                txt2.put("health", card.getHealth());
+                txt2.put("description", card.getDescription());
                 ArrayNode txt3 = mapper.createArrayNode();
-                for (int k = 0; k < board.get(i).get(j).getColors().size(); k++) {
-                    txt3.add(board.get(i).get(j).getColors().get(k));
+                for (int k = 0; k < card.getColors().size(); k++) {
+                    txt3.add(card.getColors().get(k));
                 }
-                txt2.put("colors", txt3);
-                txt2.put("name", board.get(i).get(j).getName());
+                txt2.set("colors", txt3);
+                txt2.put("name", card.getName());
                 txt1.add(txt2);
             }
             allCards.add(txt1);
@@ -167,37 +230,41 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void getFrozenCardsOnTable(ArrayList<ArrayList<Card>> board) {
+    /**
+     *
+     * @param board
+     */
+    public final void getFrozenCardsOnTable(final ArrayList<ArrayList<Card>> board) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getFrozenCardsOnTable");
 
         ArrayNode allCards = mapper.createArrayNode();
 
-        for (int i = 0; i < board.size(); i++) {
+        for (ArrayList<Card> cards : board) {
             int frozenCardExists = 0;
 
-            for (int j = 0; j < board.get(i).size(); j++) {
-                if (board.get(i).get(j).getIsFrozen() == 1) {
+            for (Card card : cards) {
+                if (card.getIsFrozen() == 1) {
                     frozenCardExists = 1;
                     break;
                 }
             }
 
             if (frozenCardExists == 1) {
-                for (int j = 0; j < board.get(i).size(); j++) {
-                    if (board.get(i).get(j).getIsFrozen() == 1) {
+                for (Card card : cards) {
+                    if (card.getIsFrozen() == 1) {
                         ObjectNode txt2 = mapper.createObjectNode();
-                        txt2.put("mana", board.get(i).get(j).getMana());
-                        txt2.put("attackDamage", board.get(i).get(j).getAttackDamage());
-                        txt2.put("health", board.get(i).get(j).getHealth());
-                        txt2.put("description", board.get(i).get(j).getDescription());
+                        txt2.put("mana", card.getMana());
+                        txt2.put("attackDamage", card.getAttackDamage());
+                        txt2.put("health", card.getHealth());
+                        txt2.put("description", card.getDescription());
                         ArrayNode txt3 = mapper.createArrayNode();
-                        for (int k = 0; k < board.get(i).get(j).getColors().size(); k++) {
-                            txt3.add(board.get(i).get(j).getColors().get(k));
+                        for (int k = 0; k < card.getColors().size(); k++) {
+                            txt3.add(card.getColors().get(k));
                         }
-                        txt2.put("colors", txt3);
-                        txt2.put("name", board.get(i).get(j).getName());
+                        txt2.set("colors", txt3);
+                        txt2.put("name", card.getName());
                         allCards.add(txt2);
                     }
                 }
@@ -207,7 +274,14 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void getCardAtPosition(int x, int y, ArrayList<ArrayList<Card>> board) {
+    /**
+     *
+     * @param x
+     * @param y
+     * @param board
+     */
+    public final void getCardAtPosition(final int x, final int y,
+                                        final ArrayList<ArrayList<Card>> board) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getCardAtPosition");
@@ -227,14 +301,19 @@ public class ConvertJson {
             for (int i = 0; i < board.get(x).get(y).getColors().size(); i++) {
                 txt3.add(board.get(x).get(y).getColors().get(i));
             }
-            txt2.put("colors", txt3);
+            txt2.set("colors", txt3);
             txt2.put("name", board.get(x).get(y).getName());
             txt.set("output", txt2);
         }
         out.add(txt);
     }
 
-    public void getPlayerDeck(ArrayList<Card> deckCards, int playerIdx) {
+    /**
+     *
+     * @param deckCards
+     * @param playerIdx
+     */
+    public final void getPlayerDeck(final ArrayList<Card> deckCards, final int playerIdx) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getPlayerDeck");
@@ -242,25 +321,30 @@ public class ConvertJson {
 
         ArrayNode deck = mapper.createArrayNode();
 
-        for (int i = 0; i < deckCards.size(); i++) {
+        for (Card deckCard : deckCards) {
             ObjectNode txt2 = mapper.createObjectNode();
-            txt2.put("mana", deckCards.get(i).getMana());
-            txt2.put("attackDamage", deckCards.get(i).getAttackDamage());
-            txt2.put("health", deckCards.get(i).getHealth());
-            txt2.put("description", deckCards.get(i).getDescription());
+            txt2.put("mana", deckCard.getMana());
+            txt2.put("attackDamage", deckCard.getAttackDamage());
+            txt2.put("health", deckCard.getHealth());
+            txt2.put("description", deckCard.getDescription());
             ArrayNode txt3 = mapper.createArrayNode();
-                for (int j = 0; j < deckCards.get(i).getColors().size(); j++) {
-                    txt3.add(deckCards.get(i).getColors().get(j));
-                }
-            txt2.put("colors", txt3);
-            txt2.put("name", deckCards.get(i).getName());
+            for (int j = 0; j < deckCard.getColors().size(); j++) {
+                txt3.add(deckCard.getColors().get(j));
+            }
+            txt2.set("colors", txt3);
+            txt2.put("name", deckCard.getName());
             deck.add(txt2);
         }
         txt.set("output", deck);
         out.add(txt);
     }
 
-    public void getCardsInHand(ArrayList<Card> handCards, int playerIdx) {
+    /**
+     *
+     * @param handCards
+     * @param playerIdx
+     */
+    public final void getCardsInHand(final ArrayList<Card> handCards, final int playerIdx) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getCardsInHand");
@@ -268,25 +352,30 @@ public class ConvertJson {
 
         ArrayNode card = mapper.createArrayNode();
 
-        for (int i = 0; i < handCards.size(); i++) {
+        for (Card handCard : handCards) {
             ObjectNode txt2 = mapper.createObjectNode();
-            txt2.put("mana", handCards.get(i).getMana());
-            txt2.put("attackDamage", handCards.get(i).getAttackDamage());
-            txt2.put("health", handCards.get(i).getHealth());
-            txt2.put("description", handCards.get(i).getDescription());
+            txt2.put("mana", handCard.getMana());
+            txt2.put("attackDamage", handCard.getAttackDamage());
+            txt2.put("health", handCard.getHealth());
+            txt2.put("description", handCard.getDescription());
             ArrayNode txt3 = mapper.createArrayNode();
-            for (int j = 0; j < handCards.get(i).getColors().size(); j++) {
-                txt3.add(handCards.get(i).getColors().get(j));
+            for (int j = 0; j < handCard.getColors().size(); j++) {
+                txt3.add(handCard.getColors().get(j));
             }
-            txt2.put("colors", txt3);
-            txt2.put("name", handCards.get(i).getName());
+            txt2.set("colors", txt3);
+            txt2.put("name", handCard.getName());
             card.add(txt2);
         }
         txt.set("output", card);
         out.add(txt);
     }
 
-    public void getPlayerHero(Card hero, int playerIdx) {
+    /**
+     *
+     * @param hero
+     * @param playerIdx
+     */
+    public final void getPlayerHero(final Card hero, final int playerIdx) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getPlayerHero");
@@ -300,7 +389,7 @@ public class ConvertJson {
         for (int i = 0; i < hero.getColors().size(); i++) {
             txt3.add(hero.getColors().get(i));
         }
-        txt2.put("colors", txt3);
+        txt2.set("colors", txt3);
         txt2.put("name", hero.getName());
         txt2.put("health", hero.getHealth());
 
@@ -308,7 +397,11 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void getPlayerTurn(Game table) {
+    /**
+     *
+     * @param table
+     */
+    public final void getPlayerTurn(final Game table) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
         txt.put("command", "getPlayerTurn");

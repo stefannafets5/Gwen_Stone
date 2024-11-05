@@ -1,4 +1,4 @@
-package Card;
+package card;
 
 import java.util.ArrayList;
 
@@ -12,88 +12,107 @@ public class Card {
     private ArrayList<String> colors;
     private String name;
 
-    public Card() {}
+    public Card() { }
 
-    public int getMana() {
+    public final int getMana() {
         return mana;
     }
 
-    public void setMana(final int mana) {
+    public final void setMana(final int mana) {
         this.mana = mana;
     }
 
-    public int getAttackDamage() {
+    public final int getAttackDamage() {
         return attackDamage;
     }
 
-    public void setAttackDamage(final int attackDamage) {
+    public final void setAttackDamage(final int attackDamage) {
         this.attackDamage = attackDamage;
     }
 
-    public int getHealth() {
+    public final int getHealth() {
         return health;
     }
 
-    public void setHealth(final int health) {
+    public final void setHealth(final int health) {
         this.health = health;
     }
 
-    public int getHasAttacked() { return hasAttacked; }
+    public final int getHasAttacked() {
+        return hasAttacked;
+    }
 
-    public void setHasAttacked(int hasAttacked) { this.hasAttacked = hasAttacked; }
+    public final void setHasAttacked(final int hasAttacked) {
+        this.hasAttacked = hasAttacked;
+    }
 
-    public int getIsFrozen() {
+    public final int getIsFrozen() {
         return isFrozen;
     }
 
-    public void setIsFrozen(int isFrozen) {
+    public final void setIsFrozen(final int isFrozen) {
         this.isFrozen = isFrozen;
     }
 
-    public String getDescription() {
+    public final String getDescription() {
         return description;
     }
 
-    public void setDescription(final String description) {
+    public final void setDescription(final String description) {
         this.description = description;
     }
 
-    public ArrayList<String> getColors() {
+    public final ArrayList<String> getColors() {
         return colors;
     }
 
-    public void setColors(final ArrayList<String> colors) {
+    public final void setColors(final ArrayList<String> colors) {
         this.colors = colors;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public void setName(final String name) {
+    public final void setName(final String name) {
         this.name = name;
     }
 
-    public void subtractHealth(int minusHealth) {
+    /**
+     * @param minusHealth
+     */
+    public final void subtractHealth(final int minusHealth) {
         setHealth(getHealth() - minusHealth);
     }
 
-    public void addHealth(int plusHealth) {
+    /**
+     * @param plusHealth
+     */
+    public final void addHealth(final int plusHealth) {
         setHealth(getHealth() + plusHealth);
     }
 
-    public void subtractAttack(int minusAttack) {
+    /**
+     * @param minusAttack
+     */
+    public final void subtractAttack(final int minusAttack) {
         setAttackDamage(getAttackDamage() - minusAttack);
         if (getAttackDamage() < 0) {
             setAttackDamage(0);
         }
     }
 
-    public void addAttack(int plusAttack) {
+    /**
+     * @param plusAttack
+     */
+    public final void addAttack(final int plusAttack) {
         setAttackDamage(getAttackDamage() + plusAttack);
     }
 
-    public Card cloneCard() {
+    /**
+     * @return
+     */
+    public final Card cloneCard() {
         Card copy = new Card();
         copy.setMana(this.mana);
         copy.setHealth(this.health);
@@ -107,7 +126,7 @@ public class Card {
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return "CardInput{"
                 +  "mana="
                 + mana
@@ -125,25 +144,5 @@ public class Card {
                 + name
                 + '\''
                 + '}';
-    }
-
-    public void useAbility() {
-        if (this.getName().equals("The Ripper")) {
-
-        } else if (this.getName().equals("Miraj")) {
-
-        }else if (this.getName().equals("The Cursed One")) {
-
-        }else if (this.getName().equals("Disciple")) {
-
-        } else if (this.getName().equals("Lord Royce")) {
-
-        } else if (this.getName().equals("Empress Thorina")) {
-
-        }else if (this.getName().equals("King Mudface")) {
-
-        }else if (this.getName().equals("General Kocioraw")) {
-
-        }
     }
 }

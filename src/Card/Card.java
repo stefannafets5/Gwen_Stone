@@ -89,6 +89,23 @@ public class Card {
         }
     }
 
+    public void addAttack(int plusAttack) {
+        setAttackDamage(getAttackDamage() + plusAttack);
+    }
+
+    public Card cloneCard() {
+        Card copy = new Card();
+        copy.setMana(this.mana);
+        copy.setHealth(this.health);
+        copy.setName(this.name);
+        copy.setColors(this.colors);
+        copy.setIsFrozen(this.isFrozen);
+        copy.setHasAttacked(this.hasAttacked);
+        copy.setDescription(this.description);
+        copy.setAttackDamage(this.attackDamage);
+        return copy;
+    }
+
     @Override
     public String toString() {
         return "CardInput{"

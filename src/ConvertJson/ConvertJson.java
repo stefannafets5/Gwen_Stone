@@ -1,5 +1,6 @@
 package ConvertJson;
 
+import Player.Player;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -16,6 +17,30 @@ public class ConvertJson {
 
     }
 
+    public void getTotalGamesPlayed(Player player) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+        txt.put("command", "getTotalGamesPlayed");
+        txt.put("output", player.getGamesPlayed());
+        out.add(txt);
+    }
+
+    public void getPlayerOneWins(Player player) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+        txt.put("command", "getPlayerOneWins");
+        txt.put("output", player.getGamesWon());
+        out.add(txt);
+    }
+
+    public void getPlayerTwoWins(Player player) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+        txt.put("command", "getPlayerTwoWins");
+        txt.put("output", player.getGamesWon());
+        out.add(txt);
+    }
+
     public void gameEnded(int winnerIdx) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
@@ -27,12 +52,30 @@ public class ConvertJson {
         out.add(txt);
     }
 
-    public void noMana(int cardIdx) {
+    public void heroHasAttacked(int affectedRow) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode txt = mapper.createObjectNode();
-        txt.put("command", "placeCard");
-        txt.put("handIdx", cardIdx);
-        txt.put("error", "Not enough mana to place card on table.");
+        txt.put("command", "useHeroAbility");
+        txt.put("affectedRow", affectedRow);
+        txt.put("error", "Hero has already attacked this turn.");
+        out.add(txt);
+    }
+
+    public void wrongRowAttacked(int affectedRow, String error) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+        txt.put("command", "useHeroAbility");
+        txt.put("affectedRow", affectedRow);
+        txt.put("error", error);
+        out.add(txt);
+    }
+
+    public void noMana(int secondLineInt, String secondLine, String command, String error) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+        txt.put("command", command);
+        txt.put(secondLine, secondLineInt);
+        txt.put("error", error);
         out.add(txt);
     }
 
@@ -119,6 +162,46 @@ public class ConvertJson {
                 txt1.add(txt2);
             }
             allCards.add(txt1);
+        }
+        txt.set("output", allCards);
+        out.add(txt);
+    }
+
+    public void getFrozenCardsOnTable(ArrayList<ArrayList<Card>> board) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode txt = mapper.createObjectNode();
+        txt.put("command", "getFrozenCardsOnTable");
+
+        ArrayNode allCards = mapper.createArrayNode();
+
+        for (int i = 0; i < board.size(); i++) {
+            int frozenCardExists = 0;
+
+            for (int j = 0; j < board.get(i).size(); j++) {
+                if (board.get(i).get(j).getIsFrozen() == 1) {
+                    frozenCardExists = 1;
+                    break;
+                }
+            }
+
+            if (frozenCardExists == 1) {
+                for (int j = 0; j < board.get(i).size(); j++) {
+                    if (board.get(i).get(j).getIsFrozen() == 1) {
+                        ObjectNode txt2 = mapper.createObjectNode();
+                        txt2.put("mana", board.get(i).get(j).getMana());
+                        txt2.put("attackDamage", board.get(i).get(j).getAttackDamage());
+                        txt2.put("health", board.get(i).get(j).getHealth());
+                        txt2.put("description", board.get(i).get(j).getDescription());
+                        ArrayNode txt3 = mapper.createArrayNode();
+                        for (int k = 0; k < board.get(i).get(j).getColors().size(); k++) {
+                            txt3.add(board.get(i).get(j).getColors().get(k));
+                        }
+                        txt2.put("colors", txt3);
+                        txt2.put("name", board.get(i).get(j).getName());
+                        allCards.add(txt2);
+                    }
+                }
+            }
         }
         txt.set("output", allCards);
         out.add(txt);

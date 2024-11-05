@@ -92,11 +92,21 @@ public class Game {
             if (!getPlayer(1).getCurrentDeck().isEmpty()) {
                 getPlayer(1).fromDeckToHand();
             }
-
-            for (int i = 0; i < getBoard().size(); i++) {
+        }
+        if (playerIdx == 0) {
+            for (int i = 2; i < 4; i++) {
                 for (int j = 0; j < getBoard().get(i).size(); j++) {
-                    getBoard().get(i).get(j).setHasAttacked(0);
                     getBoard().get(i).get(j).setIsFrozen(0);
+                    getBoard().get(i).get(j).setHasAttacked(0);
+                    getPlayer(0).getHero().setHasAttacked(0);
+                }
+            }
+        } else { // playerIdx = 1
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < getBoard().get(i).size(); j++) {
+                    getBoard().get(i).get(j).setIsFrozen(0);
+                    getBoard().get(i).get(j).setHasAttacked(0);
+                    getPlayer(1).getHero().setHasAttacked(0);
                 }
             }
         }
@@ -126,11 +136,69 @@ public class Game {
             if (getBoard().get(row).size() == 5) {
                 out.noSpaceToPlace(cardIdx);
             } else {
-                getBoard().get(row).add(placedCard);
+                getBoard().get(row).add(placedCard.cloneCard());
                 getPlayer(playerIdx).getCardsInHand().remove(cardIdx);
             }
         } else {
-            out.noMana(cardIdx);
+            out.noMana(cardIdx, "handIdx", "placeCard"
+                       , "Not enough mana to place card on table.");
+        }
+    }
+
+    public void useHeroAbility(int affectedRow, ConvertJson out) {
+        Card currentHero = getPlayer(getPlayerTurn()).getHero();
+        int manaCost = currentHero.getMana();
+        if (getPlayer(getPlayerTurn()).getTotalMana() >= manaCost) {
+            if (currentHero.getHasAttacked() == 0) {
+                if (currentHero.getName().equals("Lord Royce") || currentHero.getName().equals("Empress Thorina")) {
+                    if ((getPlayerTurn() == 0 && (affectedRow == 2 || affectedRow == 3))
+                        || (getPlayerTurn() == 1 && (affectedRow == 0 || affectedRow == 1))) {
+                        out.wrongRowAttacked(affectedRow, "Selected row does not belong to the enemy.");
+                    } else {
+                        currentHero.setHasAttacked(1);
+                        getPlayer(getPlayerTurn()).subtractMana(manaCost);
+                        if (currentHero.getName().equals("Lord Royce")) {
+                            for (int i = 0; i < getBoard().get(affectedRow).size(); i++) {
+                                getBoard().get(affectedRow).get(i).setIsFrozen(1);
+                            }
+                        } else { // Empress Thorina
+                            int maxHealthIdx = -1;
+                            int maxHealth = 0;
+                            for (int i = 0; i < getBoard().get(affectedRow).size(); i++) {
+                                if (maxHealth < getBoard().get(affectedRow).get(i).getHealth()) {
+                                    maxHealth = getBoard().get(affectedRow).get(i).getHealth();
+                                    maxHealthIdx = i;
+                                }
+                            }
+                            if (maxHealthIdx != -1) { // Row not empty
+                                getBoard().get(affectedRow).remove(maxHealthIdx);
+                            }
+                        }
+                    }
+                } else {
+                    if ((getPlayerTurn() == 1 && (affectedRow == 2 || affectedRow == 3))
+                        || (getPlayerTurn() == 0 && (affectedRow == 0 || affectedRow == 1))) {
+                        out.wrongRowAttacked(affectedRow, "Selected row does not belong to the current player.");
+                    } else {
+                        currentHero.setHasAttacked(1);
+                        getPlayer(getPlayerTurn()).subtractMana(manaCost);
+                        if (currentHero.getName().equals("General Kocioraw")) {
+                            for (int i = 0; i < getBoard().get(affectedRow).size(); i++) {
+                                getBoard().get(affectedRow).get(i).addAttack(1);
+                            }
+                        } else { // King Mudface
+                            for (int i = 0; i < getBoard().get(affectedRow).size(); i++) {
+                                getBoard().get(affectedRow).get(i).addHealth(1);
+                            }
+                        }
+                    }
+                }
+            } else {
+                out.heroHasAttacked(affectedRow);
+            }
+        } else {
+            out.noMana(affectedRow, "affectedRow", "useHeroAbility"
+                       , "Not enough mana to use hero's ability.");
         }
     }
 
@@ -162,25 +230,8 @@ public class Game {
                             || getBoard().get(x2).get(y2).getName().equals("Warden")) {
                         attackedCardIsTank = 1;
                     }
-                    int enemyHasTank = 0;
-                    if (playerIdx == 0) {
-                        for (int i = 0; i < getBoard().get(1).size(); i++) {
-                            if (getBoard().get(1).get(i).getName().equals("Goliath")
-                                    || getBoard().get(1).get(i).getName().equals("Warden")) {
-                                enemyHasTank = 1;
-                                break;
-                            }
-                        }
-                    } else {
-                        for (int i = 0; i < getBoard().get(2).size(); i++) {
-                            if (getBoard().get(2).get(i).getName().equals("Goliath")
-                                    || getBoard().get(2).get(i).getName().equals("Warden")) {
-                                enemyHasTank = 1;
-                                break;
-                            }
-                        }
-                    }
-                    if (enemyHasTank == 1 && attackedCardIsTank == 0) {
+                    int enemyHasTank = getEnemyHasTank(playerIdx);
+                    if ((enemyHasTank == 1) && (attackedCardIsTank == 0)) {
                         out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAbility", "Attacked card is not of type 'Tank'.");
                     } else {
                         if (getBoard().get(x1).get(y1).getName().equals("The Ripper")) {
@@ -203,7 +254,8 @@ public class Game {
                         }
                     }
                 } else {
-                    out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAbility", "Attacked card does not belong to the enemy.");
+                    out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAbility"
+                                           , "Attacked card does not belong to the enemy.");
                 }
             }
         }
@@ -222,24 +274,7 @@ public class Game {
                     || getBoard().get(x2).get(y2).getName().equals("Warden")) {
                 attackedCardIsTank = 1;
             }
-            int enemyHasTank = 0;
-            if (playerIdx == 0) {
-                for (int i = 0; i < getBoard().get(1).size(); i++) {
-                    if (getBoard().get(1).get(i).getName().equals("Goliath")
-                            || getBoard().get(1).get(i).getName().equals("Warden")) {
-                        enemyHasTank = 1;
-                        break;
-                    }
-                }
-            } else {
-                for (int i = 0; i < getBoard().get(2).size(); i++) {
-                    if (getBoard().get(2).get(i).getName().equals("Goliath")
-                            || getBoard().get(2).get(i).getName().equals("Warden")) {
-                        enemyHasTank = 1;
-                        break;
-                    }
-                }
-            }
+            int enemyHasTank = getEnemyHasTank(playerIdx);
 
             if ((playerIdx == 0 && (x2 == 2 || x2 == 3)) || (playerIdx == 1 && (x2 == 0 || x2 == 1))) {
                 out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAttack", "Attacked card does not belong to the enemy.");
@@ -247,7 +282,7 @@ public class Game {
                 out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAttack", "Attacker card has already attacked this turn.");
             } else if (getBoard().get(x1).get(y1).getIsFrozen() == 1) {
                 out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAttack", "Attacker card is frozen.");
-            } else if (enemyHasTank == 1 && attackedCardIsTank == 0) {
+            } else if ((enemyHasTank == 1) && (attackedCardIsTank == 0)) {
                 out.cardAttackingError(cardAttacker, cardAttacked, "cardUsesAttack", "Attacked card is not of type 'Tank'.");
             } else { // can attack
                 getBoard().get(x2).get(y2).subtractHealth(getBoard().get(x1).get(y1).getAttackDamage());
@@ -265,24 +300,7 @@ public class Game {
 
         if (y1 < getBoard().get(x1).size()) {
             int playerIdx = getPlayerTurn();
-            int enemyHasTank = 0;
-            if (playerIdx == 0) {
-                for (int i = 0; i < getBoard().get(1).size(); i++) {
-                    if (getBoard().get(1).get(i).getName().equals("Goliath")
-                            || getBoard().get(1).get(i).getName().equals("Warden")) {
-                        enemyHasTank = 1;
-                        break;
-                    }
-                }
-            } else {
-                for (int i = 0; i < getBoard().get(2).size(); i++) {
-                    if (getBoard().get(2).get(i).getName().equals("Goliath")
-                            || getBoard().get(2).get(i).getName().equals("Warden")) {
-                        enemyHasTank = 1;
-                        break;
-                    }
-                }
-            }
+            int enemyHasTank = getEnemyHasTank(playerIdx);
             if (getBoard().get(x1).get(y1).getIsFrozen() == 1) {
                 out.cardAttackingHeroError(cardAttacker, "Attacker card is frozen.");
             } else if (getBoard().get(x1).get(y1).getHasAttacked() == 1) {
@@ -303,16 +321,40 @@ public class Game {
         }
     }
 
+    private int getEnemyHasTank(int playerIdx) {
+        int enemyHasTank = 0;
+        if (playerIdx == 0) {
+            for (int i = 0; i < getBoard().get(1).size(); i++) {
+                if ((getBoard().get(1).get(i).getName().equals("Goliath")
+                        || getBoard().get(1).get(i).getName().equals("Warden"))
+                        && (getBoard().get(1).get(i).getHealth() > 0)) {
+                    enemyHasTank = 1;
+                    break;
+                }
+            }
+        } else {
+            for (int i = 0; i < getBoard().get(2).size(); i++) {
+                if ((getBoard().get(2).get(i).getName().equals("Goliath")
+                        || getBoard().get(2).get(i).getName().equals("Warden"))
+                        && (getBoard().get(2).get(i).getHealth() > 0)) {
+                    enemyHasTank = 1;
+                    break;
+                }
+            }
+        }
+        return enemyHasTank;
+    }
+
     public void startGame(Input inputData, int i) {
         setPlayerTurn(inputData.getGames().get(i).getStartGame().getStartingPlayer() - 1);
         for (int j = 0; j < 2; j++) {
             getPlayer(j).setTotalMana(1);
             getPlayer(j).setHasPlayed(0);
-            getPlayer(j).getHero().setHealth(Player.INITIAL_HERO_HEALTH);
         }
         for (int j = 0 ; j < getBoard().size(); j++) {
             getBoard().get(j).clear();
         }
+        setGameTurn(1);
         setActions(inputData.getGames().get(i).getActions());
 
         getPlayer(0).setHero(inputData.getGames().get(i).getStartGame().getPlayerOneHero());

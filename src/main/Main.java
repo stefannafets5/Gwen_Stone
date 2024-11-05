@@ -19,7 +19,7 @@ import java.util.Objects;
 import Game.Game;
 
 /**
- * The entry point to this homework. It runs the checker that tests your implentation.
+ * The entry point to this homework. It runs the checker that tests your implementation.
  */
 public final class Main {
     /**
@@ -81,6 +81,7 @@ public final class Main {
 
         for(int i = 0; i < inputData.getGames().size(); i++) {
             game.startGame(inputData, i);
+            game.setGameTurn(1);
             boolean gameEnd = false;
 
             for (int j = 0; j < game.getActions().size(); j++) {
@@ -98,9 +99,17 @@ public final class Main {
                     out.getCardsInHand(game.getPlayer(index).getCardsInHand(), index + 1);
                 } else if (game.getActions().get(j).getCommand().equals("getCardsOnTable")) {
                     out.getCardsOnTable(game.getBoard());
+                } else if (game.getActions().get(j).getCommand().equals("getFrozenCardsOnTable")) {
+                    out.getFrozenCardsOnTable(game.getBoard());
                 } else if (game.getActions().get(j).getCommand().equals("getCardAtPosition")) {
                     out.getCardAtPosition(game.getActions().get(j).getX()
                             , game.getActions().get(j).getY(), game.getBoard());
+                } else if (game.getActions().get(j).getCommand().equals("getTotalGamesPlayed")) {
+                    out.getTotalGamesPlayed(game.getPlayer(0));
+                } else if (game.getActions().get(j).getCommand().equals("getPlayerOneWins")) {
+                    out.getPlayerOneWins(game.getPlayer(0));
+                } else if (game.getActions().get(j).getCommand().equals("getPlayerTwoWins")) {
+                    out.getPlayerTwoWins(game.getPlayer(1));
                 } else if (game.getActions().get(j).getCommand().equals("endPlayerTurn") && !gameEnd) {
                     game.endTurn();
                 } else if (game.getActions().get(j).getCommand().equals("placeCard") && !gameEnd) {
@@ -116,6 +125,8 @@ public final class Main {
                     if (game.getPlayer(0).getHero().getHealth() <= 0 || game.getPlayer(1).getHero().getHealth() <= 0) {
                         gameEnd = true; // someone lost
                     }
+                } else if (game.getActions().get(j).getCommand().equals("useHeroAbility") && !gameEnd) {
+                    game.useHeroAbility(game.getActions().get(j).getAffectedRow(), out);
                 }
             }
         }

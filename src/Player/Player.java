@@ -44,6 +44,7 @@ public class Player {
         hero.setMana(heroInput.getMana());
         hero.setHealth(INITIAL_HERO_HEALTH);
         hero.setName(heroInput.getName());
+        hero.setHasAttacked(0);
     }
 
     public int getHasPlayed() {

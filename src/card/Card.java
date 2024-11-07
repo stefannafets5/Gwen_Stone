@@ -3,16 +3,20 @@ package card;
 import java.util.ArrayList;
 
 public class Card {
+    private int isTank;
     private int mana;
     private int attackDamage;
     private int health;
-    private int isFrozen = 0;
-    private int hasAttacked = 0;
+    private int isFrozen;
+    private int hasAttacked;
     private String description;
     private ArrayList<String> colors;
     private String name;
 
-    public Card() { }
+    public Card() {
+        this.isFrozen = 0;
+        this.hasAttacked = 0;
+    }
 
     public final int getMana() {
         return mana;
@@ -78,6 +82,14 @@ public class Card {
         this.name = name;
     }
 
+    public final int getIsTank() {
+        return isTank;
+    }
+
+    public final void setIsTank(final int isTank) {
+        this.isTank = isTank;
+    }
+
     /**
      * @param minusHealth
      */
@@ -110,19 +122,35 @@ public class Card {
     }
 
     /**
+     *
+     * @param attacked
+     */
+    public final void useAttack(final Card attacked) {
+        attacked.subtractHealth(this.getAttackDamage());
+        setHasAttacked(1);
+    }
+
+    /**
+     *
+     * @param attacked
+     */
+    public void useAbility(final Card attacked) {
+    }
+
+    /**
+     *
+     * @param row
+     * @param board
+     */
+    public void useAbility(final int row, final ArrayList<ArrayList<Card>> board) {
+
+    }
+
+    /**
      * @return
      */
-    public final Card cloneCard() {
-        Card copy = new Card();
-        copy.setMana(this.mana);
-        copy.setHealth(this.health);
-        copy.setName(this.name);
-        copy.setColors(this.colors);
-        copy.setIsFrozen(this.isFrozen);
-        copy.setHasAttacked(this.hasAttacked);
-        copy.setDescription(this.description);
-        copy.setAttackDamage(this.attackDamage);
-        return copy;
+    public Card cloneCard() {
+        return new Card();
     }
 
     @Override

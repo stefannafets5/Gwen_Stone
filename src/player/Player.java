@@ -5,6 +5,18 @@ import java.util.Collections;
 import java.util.Random;
 import fileio.CardInput;
 import card.Card;
+import card.Sentinel;
+import card.Berserker;
+import card.Goliath;
+import card.Warden;
+import card.TheRipper;
+import card.Miraj;
+import card.TheCursedOne;
+import card.Disciple;
+import card.LordRoyce;
+import card.EmpressThorina;
+import card.KingMudface;
+import card.GeneralKocioraw;
 
 public class Player {
     public static final int INITIAL_HERO_HEALTH = 30;
@@ -12,7 +24,7 @@ public class Player {
     private int totalMana = 0;
     private int gamesWon = 0;
     private int gamesPlayed = 0;
-    private final Card hero = new Card();
+    private Card hero;
     private final ArrayList<Card> cardsInHand;
     private ArrayList<Card> currentDeck;
     private ArrayList<ArrayList<Card>> decks;
@@ -41,12 +53,21 @@ public class Player {
      * @param heroInput
      */
     public final void setHero(final CardInput heroInput) {
-        hero.setColors(heroInput.getColors());
-        hero.setDescription(heroInput.getDescription());
-        hero.setMana(heroInput.getMana());
-        hero.setHealth(INITIAL_HERO_HEALTH);
-        hero.setName(heroInput.getName());
-        hero.setHasAttacked(0);
+        if ("Lord Royce".equals(heroInput.getName())) {
+            this.hero = new LordRoyce();
+        } else if ("Empress Thorina".equals(heroInput.getName())) {
+            this.hero = new EmpressThorina();
+        } else if ("King Mudface".equals(heroInput.getName())) {
+            this.hero = new KingMudface();
+        } else if ("General Kocioraw".equals(heroInput.getName())) {
+            this.hero = new GeneralKocioraw();
+        }
+        this.hero.setColors(heroInput.getColors());
+        this.hero.setDescription(heroInput.getDescription());
+        this.hero.setMana(heroInput.getMana());
+        this.hero.setHealth(INITIAL_HERO_HEALTH);
+        this.hero.setName(heroInput.getName());
+        this.hero.setHasAttacked(0);
     }
 
     public final int getHasPlayed() {
@@ -140,14 +161,57 @@ public class Player {
         currentDeck = new ArrayList<>(decks.get(deckNumber));
         Collections.shuffle(currentDeck, new Random(seed));
         cardsInHand.clear();
-        cardsInHand.add(currentDeck.remove(0));
+
+        Card firstCard = currentDeck.remove(0);
+        Card specificCard = getCard(firstCard);
+        if (specificCard != null) {
+            specificCard.setColors(firstCard.getColors());
+            specificCard.setDescription(firstCard.getDescription());
+            specificCard.setAttackDamage(firstCard.getAttackDamage());
+            specificCard.setMana(firstCard.getMana());
+            specificCard.setHealth(firstCard.getHealth());
+            specificCard.setName(firstCard.getName());
+        }
+        cardsInHand.add(specificCard);
+    }
+
+    private static Card getCard(final Card firstCard) {
+        Card specificCard = null;
+        if ("Sentinel".equals(firstCard.getName())) {
+            specificCard = new Sentinel();
+        } else if ("Berserker".equals(firstCard.getName())) {
+            specificCard = new Berserker();
+        } else if ("Goliath".equals(firstCard.getName())) {
+            specificCard = new Goliath();
+        } else if ("Warden".equals(firstCard.getName())) {
+            specificCard = new Warden();
+        } else if ("The Ripper".equals(firstCard.getName())) {
+            specificCard = new TheRipper();
+        } else if ("Miraj".equals(firstCard.getName())) {
+            specificCard = new Miraj();
+        } else if ("The Cursed One".equals(firstCard.getName())) {
+            specificCard = new TheCursedOne();
+        } else if ("Disciple".equals(firstCard.getName())) {
+            specificCard = new Disciple();
+        }
+        return specificCard;
     }
 
     /**
      *
      */
     public final void fromDeckToHand() {
-        cardsInHand.add(currentDeck.remove(0));
+        Card firstCard = currentDeck.remove(0);
+        Card specificCard = getCard(firstCard);
+        if (specificCard != null) {
+            specificCard.setColors(firstCard.getColors());
+            specificCard.setDescription(firstCard.getDescription());
+            specificCard.setAttackDamage(firstCard.getAttackDamage());
+            specificCard.setMana(firstCard.getMana());
+            specificCard.setHealth(firstCard.getHealth());
+            specificCard.setName(firstCard.getName());
+        }
+        cardsInHand.add(specificCard);
     }
 
     /**
@@ -170,6 +234,5 @@ public class Player {
                 decks.get(i).add(card);
             }
         }
-
     }
 }

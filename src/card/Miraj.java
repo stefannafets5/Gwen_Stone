@@ -9,8 +9,9 @@ public final class Miraj extends Card {
 
     /**
      *
-     * @param attacked
+     * @param attacked card being affected by ability
      */
+    @Override
     public void useAbility(final Card attacked) {
         int aux = getHealth();
         setHealth(attacked.getHealth());
@@ -20,8 +21,9 @@ public final class Miraj extends Card {
 
     /**
      *
-     * @return
+     * @return copy of current card
      */
+    @Override
     public Miraj cloneCard() {
         Miraj copy = new Miraj();
         copy.setMana(this.getMana());

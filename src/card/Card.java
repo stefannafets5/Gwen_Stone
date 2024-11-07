@@ -91,21 +91,21 @@ public class Card {
     }
 
     /**
-     * @param minusHealth
+     * @param minusHealth health to be subtracted
      */
     public final void subtractHealth(final int minusHealth) {
         setHealth(getHealth() - minusHealth);
     }
 
     /**
-     * @param plusHealth
+     * @param plusHealth health to be added
      */
     public final void addHealth(final int plusHealth) {
         setHealth(getHealth() + plusHealth);
     }
 
     /**
-     * @param minusAttack
+     * @param minusAttack attack to be subtracted
      */
     public final void subtractAttack(final int minusAttack) {
         setAttackDamage(getAttackDamage() - minusAttack);
@@ -115,7 +115,7 @@ public class Card {
     }
 
     /**
-     * @param plusAttack
+     * @param plusAttack attack to be added
      */
     public final void addAttack(final int plusAttack) {
         setAttackDamage(getAttackDamage() + plusAttack);
@@ -123,7 +123,7 @@ public class Card {
 
     /**
      *
-     * @param attacked
+     * @param attacked card being affected by attack
      */
     public final void useAttack(final Card attacked) {
         attacked.subtractHealth(this.getAttackDamage());
@@ -132,22 +132,22 @@ public class Card {
 
     /**
      *
-     * @param attacked
+     * @param attacked card being affected by ability
      */
     public void useAbility(final Card attacked) {
     }
 
     /**
      *
-     * @param row
-     * @param board
+     * @param row row being affected by ability
+     * @param board current board with cards
      */
     public void useAbility(final int row, final ArrayList<ArrayList<Card>> board) {
 
     }
 
     /**
-     * @return
+     * @return never returns, method is here just to be overridden
      */
     public Card cloneCard() {
         return new Card();
@@ -168,7 +168,6 @@ public class Card {
                 + ", colors="
                 + colors
                 + ", name='"
-                +  ""
                 + name
                 + '\''
                 + '}';

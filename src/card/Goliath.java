@@ -9,8 +9,9 @@ public final class Goliath extends Card {
 
     /**
      *
-     * @return
+     * @return copy of current card
      */
+    @Override
     public Goliath cloneCard() {
         Goliath copy = new Goliath();
         copy.setMana(this.getMana());

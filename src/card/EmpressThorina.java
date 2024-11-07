@@ -5,9 +5,10 @@ import java.util.ArrayList;
 public final class EmpressThorina extends Card {
     /**
      *
-     * @param row
-     * @param board
+     * @param row row affected byb ability
+     * @param board current board with cards
      */
+    @Override
     public void useAbility(final int row, final ArrayList<ArrayList<Card>> board) {
         int maxHealthIdx = -1;
         int maxHealth = 0;

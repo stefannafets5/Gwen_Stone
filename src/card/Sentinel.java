@@ -9,8 +9,9 @@ public final class Sentinel extends Card {
 
     /**
      *
-     * @return
+     * @return copy of current card
      */
+    @Override
     public Sentinel cloneCard() {
         Sentinel copy = new Sentinel();
         copy.setMana(this.getMana());

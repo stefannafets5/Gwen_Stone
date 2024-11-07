@@ -9,8 +9,9 @@ public final class TheRipper extends Card {
 
     /**
      *
-     * @param attacked
+     * @param attacked card being affected by ability
      */
+    @Override
     public void useAbility(final Card attacked) {
         attacked.subtractAttack(2);
         setHasAttacked(1);
@@ -18,8 +19,9 @@ public final class TheRipper extends Card {
 
     /**
      *
-     * @return
+     * @return copy of current card
      */
+    @Override
     public TheRipper cloneCard() {
         TheRipper copy = new TheRipper();
         copy.setMana(this.getMana());

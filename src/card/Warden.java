@@ -9,8 +9,9 @@ public final class Warden extends Card {
 
     /**
      *
-     * @return
+     * @return copy of current card
      */
+    @Override
     public Warden cloneCard() {
         Warden copy = new Warden();
         copy.setMana(this.getMana());

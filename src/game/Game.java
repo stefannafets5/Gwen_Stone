@@ -7,7 +7,6 @@ import fileio.ActionsInput;
 import fileio.Coordinates;
 import fileio.Input;
 
-
 import java.util.ArrayList;
 
 public class Game {
@@ -41,8 +40,8 @@ public class Game {
 
     /**
      *
-     * @param i
-     * @return
+     * @param i player index
+     * @return player number i
      */
     public final Player getPlayer(final int i) {
         return players[i];
@@ -70,7 +69,7 @@ public class Game {
 
     /**
      *
-     * @param inputData
+     * @param inputData decks from input
      */
     public final void copyPlayerDecks(final Input inputData) {
         getPlayer(0).copyAllDecks(inputData.getPlayerOneDecks().getDecks());
@@ -78,7 +77,9 @@ public class Game {
     }
 
     /**
-     *
+     *  When each player ends they're turn, his cards get unfrozen
+     *      and his hero and card can attack again.
+     *  If a game turn has passed, mana is added to both players, and they draw a card.
      */
     public final void endTurn() {
         int playerIdx = getPlayerTurn();
@@ -127,9 +128,9 @@ public class Game {
     }
 
     /**
-     *
-     * @param cardIdx
-     * @param out
+     *  If the player has mana and if there is space on the table, the card is placed.
+     * @param cardIdx index of card to be placed from deck
+     * @param out output in case of errors
      */
     public final void placeCard(final int cardIdx, final ConvertJson out) {
         int playerIdx = getPlayerTurn();
@@ -171,9 +172,10 @@ public class Game {
     }
 
     /**
-     *
-     * @param affectedRow
-     * @param out
+     *  If the player has mana and his hero did not use his ability this round
+     *      and the ability use is valid, it takes effect.
+     * @param affectedRow row affected by ability
+     * @param out output in case of errors
      */
     public final void useHeroAbility(final int affectedRow, final ConvertJson out) {
         Card currentHero = getPlayer(getPlayerTurn()).getHero();
@@ -213,10 +215,11 @@ public class Game {
     }
 
     /**
-     *
-     * @param cardAttacker
-     * @param cardAttacked
-     * @param out
+     *  If the card is not frozen, has not attacked this round
+     *      and the ability use is valid, it takes effect.
+     * @param cardAttacker card attacking
+     * @param cardAttacked card being attacked
+     * @param out output in case of errors
      */
     public final void cardUsesAbility(final Coordinates cardAttacker,
                                       final Coordinates cardAttacked,
@@ -269,10 +272,12 @@ public class Game {
     }
 
     /**
-     *
-     * @param cardAttacker
-     * @param cardAttacked
-     * @param out
+     *  If the card is not frozen, has not attacked this turn,
+     *      the attacked card belongs to the enemy and is tank
+     *      or a tank does not exist, then the attack takes effect.
+     * @param cardAttacker card attacking
+     * @param cardAttacked card being attacked
+     * @param out output in case of errors
      */
     public final void cardUsesAttack(final Coordinates cardAttacker,
                                      final Coordinates cardAttacked,
@@ -310,9 +315,10 @@ public class Game {
     }
 
     /**
-     *
-     * @param cardAttacker
-     * @param out
+     *  If the card is not frozen, has not attacked this turn ant the enemy
+     *      does not have any tanks, the card can attack the enemy hero.
+     * @param cardAttacker card attacking
+     * @param out output in case of errors
      */
     public final void useAttackHero(final Coordinates cardAttacker, final ConvertJson out) {
         int x1 = cardAttacker.getX();
@@ -346,8 +352,8 @@ public class Game {
 
     /**
      *
-     * @param playerIdx
-     * @return
+     * @param playerIdx player to be checked if he has a tank on the table
+     * @return 1 / 0 if the enemy has / does not have a tank on the table
      */
     private int getEnemyHasTank(final int playerIdx) {
         int enemyHasTank = 0;
@@ -370,9 +376,9 @@ public class Game {
     }
 
     /**
-     *
-     * @param inputData
-     * @param i
+     *  Resets the players and table so a new game can begin.
+     * @param inputData information about the games from input
+     * @param i the index of the starting game
      */
     public final void startGame(final Input inputData, final int i) {
         setPlayerTurn(inputData.getGames().get(i).getStartGame().getStartingPlayer() - 1);

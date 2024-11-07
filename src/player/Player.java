@@ -42,7 +42,7 @@ public class Player {
 
     /**
      *
-     * @return
+     * @return current hero
      */
     public final Card getHero() {
         return hero;
@@ -50,7 +50,7 @@ public class Player {
 
     /**
      *
-     * @param heroInput
+     * @param heroInput input given
      */
     public final void setHero(final CardInput heroInput) {
         if ("Lord Royce".equals(heroInput.getName())) {
@@ -119,7 +119,7 @@ public class Player {
     }
 
     /**
-     *
+     * increments wins of a player
      */
     public final void addWin() {
         int currentWins = getGamesWon();
@@ -127,7 +127,7 @@ public class Player {
     }
 
     /**
-     *
+     * increments games played by a player
      */
     public final void addGamePlayed() {
         int currentGamesPlayed = getGamesPlayed();
@@ -136,7 +136,7 @@ public class Player {
 
     /**
      *
-     * @param mana
+     * @param mana mana to be added
      */
     public final void addMana(final int mana) {
         int currentMana = getTotalMana();
@@ -145,7 +145,7 @@ public class Player {
 
     /**
      *
-     * @param mana
+     * @param mana mana to be subtracted
      */
     public final void subtractMana(final int mana) {
         int currentMana = getTotalMana();
@@ -154,8 +154,8 @@ public class Player {
 
     /**
      *
-     * @param deckNumber
-     * @param seed
+     * @param deckNumber deck to be randomized
+     * @param seed random seed given
      */
     public final void shuffleDeck(final int deckNumber, final int seed) {
         currentDeck = new ArrayList<>(decks.get(deckNumber));
@@ -216,7 +216,7 @@ public class Player {
 
     /**
      *
-     * @param inputDecks
+     * @param inputDecks decks given from input
      */
     public final void copyAllDecks(final ArrayList<ArrayList<CardInput>> inputDecks) {
         for (int i = 0; i < inputDecks.size(); i++) {

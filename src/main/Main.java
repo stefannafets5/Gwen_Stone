@@ -17,13 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-/**
- * The entry point to this homework. It runs the checker that tests your implementation.
- */
 public final class Main {
-    /**
-     * for coding style
-     */
     private Main() {
     }
 

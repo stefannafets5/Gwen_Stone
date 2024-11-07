@@ -9,8 +9,9 @@ public final class Berserker extends Card {
 
     /**
      *
-     * @return
+     * @return copy of current card
      */
+    @Override
     public Berserker cloneCard() {
         Berserker copy = new Berserker();
         copy.setMana(this.getMana());

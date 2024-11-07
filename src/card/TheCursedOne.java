@@ -9,8 +9,9 @@ public final class TheCursedOne extends Card {
 
     /**
      *
-     * @param attacked
+     * @param attacked card being affected by ability
      */
+    @Override
     public void useAbility(final Card attacked) {
         int aux = attacked.getHealth();
         attacked.setHealth(attacked.getAttackDamage());
@@ -20,8 +21,9 @@ public final class TheCursedOne extends Card {
 
     /**
      *
-     * @return
+     * @return copy of current card
      */
+    @Override
     public TheCursedOne cloneCard() {
         TheCursedOne copy = new TheCursedOne();
         copy.setMana(this.getMana());

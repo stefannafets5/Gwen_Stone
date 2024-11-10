@@ -351,7 +351,7 @@ public class Game {
     }
 
     /**
-     *
+     *  Searches the board for enemy tanks.
      * @param playerIdx player to be checked if he has a tank on the table
      * @return 1 / 0 if the enemy has / does not have a tank on the table
      */

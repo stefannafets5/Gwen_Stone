@@ -122,7 +122,7 @@ public class Card {
     }
 
     /**
-     *
+     *  Attacked card loses health equal to the attackers damage.
      * @param attacked card being affected by attack
      */
     public final void useAttack(final Card attacked) {

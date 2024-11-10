@@ -49,7 +49,7 @@ public class Player {
     }
 
     /**
-     *
+     *  Creates a specific hero for the player based on the name given at input.
      * @param heroInput input given
      */
     public final void setHero(final CardInput heroInput) {
@@ -153,7 +153,8 @@ public class Player {
     }
 
     /**
-     *
+     *  Randomizes the current deck using the seed given and adds the first card
+     *  from the deck to the hand of the player.
      * @param deckNumber deck to be randomized
      * @param seed random seed given
      */
@@ -175,6 +176,12 @@ public class Player {
         cardsInHand.add(specificCard);
     }
 
+    /**
+     *  The input is a card of type "Card" and the method returns the specific type
+     *  of the card given.
+     * @param firstCard the card we want to know the type of
+     * @return the type of card "firstCard" is
+     */
     private static Card getCard(final Card firstCard) {
         Card specificCard = null;
         if ("Sentinel".equals(firstCard.getName())) {
@@ -198,7 +205,8 @@ public class Player {
     }
 
     /**
-     *
+     *  The player draws a card: the card is extracted from his current deck
+     *  and goes in his hand.
      */
     public final void fromDeckToHand() {
         Card firstCard = currentDeck.remove(0);
@@ -215,7 +223,7 @@ public class Player {
     }
 
     /**
-     *
+     *  Copies decks from input to players.
      * @param inputDecks decks given from input
      */
     public final void copyAllDecks(final ArrayList<ArrayList<CardInput>> inputDecks) {

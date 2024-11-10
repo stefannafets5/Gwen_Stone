@@ -53,6 +53,9 @@ public final class Main {
     }
 
     /**
+     *  Make 1 instance for the class "Game" and ine for the class "ConvertJson".
+     *  Initialize the player decks and for each game reset the board and the players.
+     *  For each action in a game, veryfy the command and use the correct method.
      * @param filePath1 for input file
      * @param filePath2 for output file
      * @throws IOException in case of exceptions to reading / writing

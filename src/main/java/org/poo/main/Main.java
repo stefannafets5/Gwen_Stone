@@ -58,6 +58,9 @@ public final class Main {
     }
 
     /**
+     *  Make 1 instance for the class "Game" and one for the class "ConvertJson".
+     *  Initialize the player decks and for each game reset the board and the players.
+     *  For each action in a game, verify the command and use the correct method.
      * @param filePath1 for input file
      * @param filePath2 for output file
      * @throws IOException in case of exceptions to reading / writing
@@ -69,7 +72,7 @@ public final class Main {
                 Input.class);
 
         ArrayNode output = objectMapper.createArrayNode();
-        ConvertJson out = new ConvertJson(output);
+            ConvertJson out = new ConvertJson(output);
 
         Game game = new Game(inputData.getPlayerOneDecks().getNrDecks(),
                 inputData.getPlayerTwoDecks().getNrDecks());
